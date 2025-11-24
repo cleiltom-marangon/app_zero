@@ -11,12 +11,7 @@ export default async function handler(req, res) {
 
   const pool = await getPool();
 
-<<<<<<< HEAD
-  // 👉 ALTERADO: nome AS name (mantém compatibilidade com frontend)
   const [rows] = await pool.query(
-=======
-    const [rows] = await pool.query(
->>>>>>> 7bde408370e96e49041fa63ba82983474c7d27f5
     'SELECT id, nome AS name, email, password, perfil, hubspot FROM Users WHERE email=?',
     [email]
   );
@@ -24,11 +19,6 @@ export default async function handler(req, res) {
   const user = rows[0];
   if (!user) return res.status(401).json({ error: 'invalid' });
 
-<<<<<<< HEAD
-  // ⚠️ Senha no seu banco é texto puro → compara direto
-  // e também permite comparação com bcrypt para futuro upgrade
-=======
->>>>>>> 7bde408370e96e49041fa63ba82983474c7d27f5
   const ok =
     password === user.password ||
     (await bcrypt.compare(password, user.password));
@@ -56,10 +46,6 @@ export default async function handler(req, res) {
     email: user.email,
     perfil: user.perfil,
     hubspot: user.hubspot,
-<<<<<<< HEAD
-    name: user.name, // já vem do AS name
-=======
     name: user.name, 
->>>>>>> 7bde408370e96e49041fa63ba82983474c7d27f5
   });
 }
