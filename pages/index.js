@@ -186,7 +186,7 @@ export default function Home() {
           <h1>ZeroGas Dashboard</h1>
         </div>
         <div>
-          {user.email} — {user.perfil}
+          {user.nome} {user.sobrenome} — {user.perfil}
         </div>
       </Header>
 
@@ -235,65 +235,80 @@ export default function Home() {
         )}
       </Section>
 
-      <Section>
-        <h2>Histórico</h2>
+    <Section>
+  <h2>Histórico</h2>
 
-        {data && (
-          <div style={{ width: "100%", height: 320 }}>
-            <ResponsiveContainer>
-              <LineChart data={data.slice().reverse()}>
-                <XAxis
-                  dataKey="data_hora"
-                  tickFormatter={(t) => new Date(t).toLocaleTimeString()}
-                />
-                <YAxis />
-                <Tooltip
-                  labelFormatter={(t) => new Date(t).toLocaleString()}
-                />
-                <Line type="monotone" dataKey="temp_in" name="Temp Interna" />
-                <Line type="monotone" dataKey="temp_ex" name="Temp Externa" />
-                <Line type="monotone" dataKey="hum_in" name="Umidade Interna" />
-                <Line type="monotone" dataKey="hum_ex" name="Umidade Externa" />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        )}
+  {/* --------- GRÁFICO 1: Temperatura e Umidade --------- */}
+  {data && (
+    <>
+      <h3 style={{ marginTop: 20 }}>Temperaturas e Umidade</h3>
+      <div style={{ width: "100%", height: 320 }}>
+        <ResponsiveContainer>
+          <LineChart data={data.slice().reverse()}>
+            <XAxis
+              dataKey="data_hora"
+              tickFormatter={(t) => new Date(t).toLocaleTimeString()}
+            />
+            <YAxis />
+            <Tooltip labelFormatter={(t) => new Date(t).toLocaleString()} />
+            <Legend />
 
-        {data && (
-          <div style={{ width: "100%", height: 240, marginTop: 20 }}>
-            <ResponsiveContainer>
-              <LineChart data={data.slice().reverse()}>
-                <XAxis
-                  dataKey="data_hora"
-                  tickFormatter={(t) => new Date(t).toLocaleTimeString()}
-                />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="co2" name="CO2" />
-                <Line type="monotone" dataKey="form" name="Formaldeído" />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        )}
+            <Line type="monotone" dataKey="temp_in" name="Temp Interna" />
+            <Line type="monotone" dataKey="temp_ex" name="Temp Externa" />
+            <Line type="monotone" dataKey="hum_in" name="Umidade Interna" />
+            <Line type="monotone" dataKey="hum_ex" name="Umidade Externa" />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    </>
+  )}
 
-        {data && (
-          <div style={{ width: "100%", height: 240, marginTop: 20 }}>
-            <ResponsiveContainer>
-              <BarChart data={data.slice().reverse()}>
-                <XAxis
-                  dataKey="data_hora"
-                  tickFormatter={(t) => new Date(t).toLocaleTimeString()}
-                />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="pm25" name="PM2.5" />
-                <Bar dataKey="pm10" name="PM10" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        )}
-      </Section>
+  {/* --------- GRÁFICO 2: CO2 + Formaldeído --------- */}
+  {data && (
+    <>
+      <h3 style={{ marginTop: 30 }}>Qualidade do Ar — CO₂ e Formaldeído</h3>
+      <div style={{ width: "100%", height: 240, marginTop: 10 }}>
+        <ResponsiveContainer>
+          <LineChart data={data.slice().reverse()}>
+            <XAxis
+              dataKey="data_hora"
+              tickFormatter={(t) => new Date(t).toLocaleTimeString()}
+            />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+
+            <Line type="monotone" dataKey="co2" name="CO2 (ppm)" />
+            <Line type="monotone" dataKey="form" name="Formaldeído (ppm)" />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    </>
+  )}
+
+  {/* --------- GRÁFICO 3: PM2.5 e PM10 --------- */}
+  {data && (
+    <>
+      <h3 style={{ marginTop: 30 }}>Partículas — PM2.5 e PM10</h3>
+      <div style={{ width: "100%", height: 240, marginTop: 10 }}>
+        <ResponsiveContainer>
+          <BarChart data={data.slice().reverse()}>
+            <XAxis
+              dataKey="data_hora"
+              tickFormatter={(t) => new Date(t).toLocaleTimeString()}
+            />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+
+            <Bar dataKey="pm25" name="PM2.5" />
+            <Bar dataKey="pm10" name="PM10" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </>
+  )}
+</Section>
     </Page>
   );
 }
