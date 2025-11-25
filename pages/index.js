@@ -45,13 +45,25 @@ export default function Home(){
       <div>{user.email} — {user.perfil}</div>
     </header>
 
-    {user.perfil==='admin' && <div style={{marginTop:20}}>
-      <label>Selecionar cliente</label>
-      <select style={{width:'100%',padding:8,marginTop:8}} value={cliente||''} onChange={e=>setCliente(e.target.value)}>
-        <option value=''>-- visão geral (últimas leituras por cliente) --</option>
-        {clients.map(c=> <option key={c.id} value={c.hubspot}>{c.nome || c.email} ({c.hubspot})</option>)}
-      </select>
-    </div>}
+{user.perfil==='admin' && (
+  <div style={{ marginTop: 20 }}>
+    <label>Selecionar cliente</label>
+    <select
+      style={{ width: '100%', padding: 8, marginTop: 8 }}
+      value={cliente || ''}
+      onChange={(e) => setCliente(e.target.value)}
+    >
+      <option value=''>-- visão geral (últimas leituras por cliente) --</option>
+
+      {clients.map((c) => (
+        <option key={c.id} value={c.hubspot}>
+          {`${c.nome} ${c.sobrenome} (${c.hubspot})`}
+        </option>
+      ))}
+    </select>
+  </div>
+)}
+
 
     <section style={{marginTop:20}}>
       <h2>Leituras recentes</h2>
