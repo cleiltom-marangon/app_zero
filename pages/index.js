@@ -25,6 +25,8 @@ const Page = styled.main`
   padding: 20px;
   font-family: "Inter", sans-serif;
   color: #062c15;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f9fff9 0%, #f3fdf3 100%);
 `;
 
 const Header = styled.header`
@@ -153,6 +155,11 @@ export default function Home() {
   if (!user) {
     return (
       <LoginBox>
+          <img
+             src="/logo/zerogas.webp"
+             alt="ZeroGas"
+             style={{ width: 130, margin: "0 auto 20px", display: "block" }}
+           />
         <h1>ZeroGas — Login</h1>
         <input
           placeholder="email"
@@ -174,7 +181,10 @@ export default function Home() {
   return (
     <Page>
       <Header>
-        <h1>ZeroGas Dashboard</h1>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <img src="/logo/zerogas.webp" alt="logo" style={{ height: 42 }} />
+          <h1>ZeroGas Dashboard</h1>
+        </div>
         <div>
           {user.email} — {user.perfil}
         </div>
