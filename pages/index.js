@@ -251,8 +251,15 @@ const Controls = styled.div`
 export default function Home() {
   const { user, setUser } = useContext(AuthContext);
   const [form, setForm] = useState({ email: "", password: "" });
+
+  // cliente / clients
   const [cliente, setCliente] = useState(null);
   const [clients, setClients] = useState([]);
+
+  // locais (galpões / salas)
+  const [locais, setLocais] = useState([]);
+  const [local, setLocal] = useState(null);
+
   const [themeName, setThemeName] = useState("light");
 
   useEffect(() => {
@@ -265,16 +272,44 @@ export default function Home() {
     if (user && user.perfil === "admin") {
       axios.get("/api/clients", { withCredentials: true }).then((r) => setClients(r.data)).catch(() => {});
     } else if (user) {
+      // não-admin: definir cliente próprio
       setCliente(user.hubspot);
     }
   }, [user]);
 
-  const endpoint = () =>
-    user && cliente
-      ? `/api/air/${cliente}`
-      : user && user.hubspot
-      ? `/api/air/${user.hubspot}`
-      : null;
+  // quando cliente for definido, carregar locais
+  useEffect(() => {
+    if (!cliente) {
+      setLocais([]);
+      setLocal(null);
+      return;
+    }
+
+    // carrega locais via novo endpoint /api/locais?cliente=...
+    axios
+      .get(`/api/locais?cliente=${encodeURIComponent(cliente)}`, { withCredentials: true })
+      .then((r) => {
+        // r.data expected: [{ local: "Galpão 1" }, ...] or array of strings
+        const rows = Array.isArray(r.data) ? r.data : [];
+        // normalize to objects with .local
+        const norm = rows.map((x) => (typeof x === "string" ? { local: x } : x));
+        setLocais(norm);
+        setLocal(norm[0]?.local || null);
+      })
+      .catch(() => {
+        setLocais([]);
+        setLocal(null);
+      });
+  }, [cliente]);
+
+  // Endpoint SWR considera cliente + local
+  const endpoint = () => {
+    if (!user) return null;
+    if (!cliente) return null;
+    // only fetch when local selected (we set a default when locais load)
+    if (!local) return null;
+    return `/api/air/${cliente}?local=${encodeURIComponent(local)}`;
+  };
 
   const { data, error } = useSWR(endpoint, fetcher, {
     refreshInterval: 10000,
@@ -284,6 +319,7 @@ export default function Home() {
     try {
       const r = await axios.post("/api/login", form, { withCredentials: true });
       setUser(r.data);
+      // ensure cliente state will be set by effect depending on user
     } catch (e) {
       alert("Login inválido");
     }
@@ -296,7 +332,6 @@ export default function Home() {
       // ignore
     }
     setUser(null);
-    // reload to clear state if needed
     if (typeof window !== "undefined") window.location.href = "/";
   }
 
@@ -311,7 +346,6 @@ export default function Home() {
     return (
       <ThemeProvider theme={themeName === "dark" ? dark : light}>
         <LoginBox>
-          {/* logo path (local file you uploaded) */}
           <img src="/logo/zerogas.webp" alt="ZeroGas" style={{ width: 130 }} />
           <h1>ZeroGas — Login</h1>
           <input placeholder="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
@@ -347,6 +381,7 @@ export default function Home() {
           </div>
         </Header>
 
+        {/* CLIENT SELECT (only admin) */}
         {user.perfil === "admin" && (
           <div>
             <label>Selecionar cliente</label>
@@ -361,6 +396,20 @@ export default function Home() {
           </div>
         )}
 
+        {/* LOCAL SELECT (shows when cliente is set and locais loaded) */}
+        {cliente && locais.length > 0 && (
+          <div style={{ marginTop: 10 }}>
+            <label>Selecionar sala / galpão</label>
+            <Select value={local || ""} onChange={(e) => setLocal(e.target.value)}>
+              {locais.map((l) => (
+                <option key={l.local} value={l.local}>
+                  {l.local}
+                </option>
+              ))}
+            </Select>
+          </div>
+        )}
+
         <Section>
           <h2>Leituras recentes</h2>
 
@@ -369,25 +418,28 @@ export default function Home() {
 
           {data && data.length > 0 && (
             <CardGrid>
-              {data.slice(0, 6).map((row, i) => (
-                <ChartCard key={i}>
-                  <CardHeader>
-                    <h3>{row.local}</h3>
-                    <div className="subtitle">{new Date(row.data_hora).toLocaleString()}</div>
-                  </CardHeader>
+              {data
+                .filter((d) => (local ? d.local === local : true))
+                .slice(0, 6)
+                .map((row, i) => (
+                  <ChartCard key={i}>
+                    <CardHeader>
+                      <h3>{row.local}</h3>
+                      <div className="subtitle">{new Date(row.data_hora).toLocaleString()}</div>
+                    </CardHeader>
 
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                    <div>Temp int: <strong>{row.temp_in}°C</strong></div>
-                    <div>Temp ext: <strong>{row.temp_ex}°C</strong></div>
-                    <div>Hum int: <strong>{row.hum_in}%</strong></div>
-                    <div>Hum ext: <strong>{row.hum_ex}%</strong></div>
-                    <div>CO2: <strong>{row.co2} ppm</strong></div>
-                    <div>Form: <strong>{row.form}</strong></div>
-                    <div>PM2.5: <strong>{row.pm25}</strong></div>
-                    <div>PM10: <strong>{row.pm10}</strong></div>
-                  </div>
-                </ChartCard>
-              ))}
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                      <div>Temp int: <strong>{row.temp_in}°C</strong></div>
+                      <div>Temp ext: <strong>{row.temp_ex}°C</strong></div>
+                      <div>Hum int: <strong>{row.hum_in}%</strong></div>
+                      <div>Hum ext: <strong>{row.hum_ex}%</strong></div>
+                      <div>CO2: <strong>{row.co2} ppm</strong></div>
+                      <div>Form: <strong>{row.form}</strong></div>
+                      <div>PM2.5: <strong>{row.pm25}</strong></div>
+                      <div>PM10: <strong>{row.pm10}</strong></div>
+                    </div>
+                  </ChartCard>
+                ))}
             </CardGrid>
           )}
         </Section>
@@ -404,7 +456,7 @@ export default function Home() {
               </CardHeader>
               <div style={{ width: "100%", height: 300 }}>
                 <ResponsiveContainer>
-                  <LineChart data={data.slice().reverse()}>
+                  <LineChart data={data.filter(d => (local ? d.local === local : true)).slice().reverse()}>
                     <XAxis dataKey="data_hora" tickFormatter={(t) => new Date(t).toLocaleTimeString()} />
                     <YAxis />
                     <Tooltip labelFormatter={(t) => new Date(t).toLocaleString()} />
@@ -428,7 +480,7 @@ export default function Home() {
               </CardHeader>
               <div style={{ width: "100%", height: 240 }}>
                 <ResponsiveContainer>
-                  <LineChart data={data.slice().reverse()}>
+                  <LineChart data={data.filter(d => (local ? d.local === local : true)).slice().reverse()}>
                     <XAxis dataKey="data_hora" tickFormatter={(t) => new Date(t).toLocaleTimeString()} />
                     <YAxis />
                     <Tooltip />
@@ -450,7 +502,7 @@ export default function Home() {
               </CardHeader>
               <div style={{ width: "100%", height: 240 }}>
                 <ResponsiveContainer>
-                  <BarChart data={data.slice().reverse()}>
+                  <BarChart data={data.filter(d => (local ? d.local === local : true)).slice().reverse()}>
                     <XAxis dataKey="data_hora" tickFormatter={(t) => new Date(t).toLocaleTimeString()} />
                     <YAxis />
                     <Tooltip />
