@@ -49,7 +49,7 @@ export default function Home(){
       <label>Selecionar cliente</label>
       <select style={{width:'100%',padding:8,marginTop:8}} value={cliente||''} onChange={e=>setCliente(e.target.value)}>
         <option value=''>-- visão geral (últimas leituras por cliente) --</option>
-        {clients.map(c=> <option key={c.id} value={c.hubspot}>{c.name || c.email} ({c.hubspot})</option>)}
+        {clients.map(c=> <option key={c.id} value={c.hubspot}>{c.nome || c.email} ({c.hubspot})</option>)}
       </select>
     </div>}
 
