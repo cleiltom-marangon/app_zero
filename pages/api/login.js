@@ -36,10 +36,10 @@ export default async function handler(req, res) {
     { expiresIn: '8h' }
   );
 
-  res.setHeader(
-    'Set-Cookie',
-    `token=${token}; HttpOnly; Path=/; Max-Age=${8 * 3600}`
-  );
+res.setHeader(
+  'Set-Cookie',
+  `token=${token}; HttpOnly; Path=/; Max-Age=${8 * 3600}; SameSite=None; Secure`
+);
 
   return res.json({
     id: user.id,
