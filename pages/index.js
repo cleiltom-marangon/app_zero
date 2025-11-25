@@ -312,7 +312,7 @@ export default function Home() {
       <ThemeProvider theme={themeName === "dark" ? dark : light}>
         <LoginBox>
           {/* logo path (local file you uploaded) */}
-          <img src="/public/logo/zerogas.webp" alt="ZeroGas" style={{ width: 130 }} />
+          <img src="/logo/zerogas.webp" alt="ZeroGas" style={{ width: 130 }} />
           <h1>ZeroGas — Login</h1>
           <input placeholder="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
           <input type="password" placeholder="senha" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
@@ -328,7 +328,7 @@ export default function Home() {
       <Page>
         <Header>
           <div className="left">
-            <Logo src="/public/logo/zerogas.webp" alt="logo" />
+            <Logo src="/logo/zerogas.webp" alt="logo" />
             <h1>ZeroGas Dashboard</h1>
           </div>
 
