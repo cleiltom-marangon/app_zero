@@ -21,7 +21,7 @@ export default async function handler(req, res) {
 
   const ok =
     password === user.password ||
-    (await bcrypt.compare(password, user.password));
+    (await bcrypt.compare);
 
   if (!ok) return res.status(401).json({ error: 'invalid' });
 
