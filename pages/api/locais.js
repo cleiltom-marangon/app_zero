@@ -45,7 +45,7 @@ export default async function handler(req, res) {
     const [rows] = await pool.query(
       `SELECT DISTINCT local 
        FROM air_quality 
-       WHERE hubspot = ? 
+       WHERE cliente = ? 
        ORDER BY local ASC`,
       [clienteId]
     );
