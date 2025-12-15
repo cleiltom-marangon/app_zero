@@ -12,7 +12,7 @@
    DB_HOST=localhost
    DB_USER=your_user
    DB_PASS=your_pass
-   DB_NAME=zerogas
+   DB_NAME=your_db
    JWT_SECRET=some_secret
    ```
 
@@ -26,6 +26,4 @@ API endpoints:
 - GET /api/air/[cliente]
 - GET /api/clients  (admin only)
 
-Notes:
-- This version uses your existing `password` column for login (plaintext comparison). It's recommended to migrate to bcrypt hashes.
-- The uploaded screenshots from your DB are included in `public/images/` for reference.
+
