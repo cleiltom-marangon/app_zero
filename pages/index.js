@@ -346,8 +346,8 @@ export default function Home() {
     return (
       <ThemeProvider theme={themeName === "dark" ? dark : light}>
         <LoginBox>
-          <img src="/logo/zerogas.webp" alt="ZeroGas" style={{ width: 130 }} />
-          <h1>ZeroGas — Login</h1>
+          <img src="/logo/zerogas.webp" alt="ZEROGas" style={{ width: 150 }} />
+          <h1>ZEROGas — Login</h1>
           <input placeholder="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
           <input type="password" placeholder="senha" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
           <button onClick={login}>Entrar</button>
